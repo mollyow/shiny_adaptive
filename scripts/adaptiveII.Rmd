@@ -1,0 +1,95 @@
+---
+title: 'ALP301: Adaptive experimentation tutorial'
+subtitle: "Tutorial part II, Simulations"
+# author: Molly Offer-Westort, Vitor Hadad, Susan Athey
+# date: "`r format(Sys.time(), '%B %d, %Y')`"
+#font-import:
+  #font-family: 'Yantramanav'
+output:
+  html_document:
+    highlight: haddock
+    theme: journal
+    number_sections: no
+    # toc: yes
+    # toc_float: true
+    # toc_depth: 2
+    self_contained: yes
+  pdf_document: 
+    toc: yes
+# theme: null
+#abstract:
+editor_options:
+  chunk_output_type: console
+runtime: shiny
+---
+
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+
+<style>
+div.medblue { background-color: #b3d1ff; border-radius: 5px; padding: 5px;}
+</style>
+
+<style>
+div.darkblue { background-color: #9ac2ff; border-radius: 5px; padding: 5px;}
+</style>
+
+## Learning Objective
+In this tutorial, you will run simulations implementing the methods introduced in part I. 
+
+
+#### Load packages
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, comment=NA)
+# Clear workspace
+rm(list = ls())
+options(digits=4)
+```
+
+```{r load_packages}
+# Use standard library calls for shiny loading
+library(bandit) # runs Bernoulli Thompson sampling
+library(shiny) # to run interactive examples
+library(knitr) # formatting tables
+library(kableExtra) # formatting tables
+library(ggplot2) # plotting
+library(reshape2) # reshaping
+library(gridExtra) # tables
+
+source('bernoulli_bandit_utils.R')
+source('bernoulli_bandit_app.R')
+```
+
+```{r shiny_app_setup, echo=FALSE}
+set.seed(94305) # Set seed for reproducibility
+```
+
+## **Further parameter choices**
+
+When we run an adaptive experiment, we make a number of choices about experimental design. This document will allow you to run simulations under different design choices. 
+
+
+### DGP
+Here, there are 8 unique treatment arms, each associated with some distribution of outcomes. Success is binary, and you can set the probability of success with the respective "Prob[Y(w) = 1]" sliders. 
+
+### Design parameters
+
+- **Experiment length:** You can vary the length of the experiment. When one arm is much better than the others, an adaptive algorithm may learn the best arm relatively quickly. When multiple good arms are close together, it may take longer for an adaptive algorithm to differentiate among arms. 
+- **Assignment probability floors:** Assignment probability floors ensure that we can continue to observe outcomes under all treatment conditions throughout the experiment, regardless of the performance of these arms early on; this reduces instability, and protects against accidental over-exploitation of suboptimal arms. It also improves the precision with which we are able to estimate mean outcomes under the worst-performing arms, which may be relevant for inference.
+- **Number of batches:** In practice, we may not be able to update treatment assignment after every observed outcome. Consequently, we will often assign treatment probabilities to observations in batches. More frequent updating may allow us to come to conclusions more quickly and reduce regret. 
+- **Algorithm:** You can select among the probabilistic algorithms discussed in part I of the tutorial. 
+- **Balancing weights:** The adaptive algorithms can be implemented with or without balancing weights. 
+- **Control condition:** If you would like to run an experiment with a control condition, you can choose to fix the probability of assignment for the control condition at 1/K, or you may allow the probability to follow standard assignment under the selected algorithm. The control condition is set here at W = 1. 
+
+_**Note:** This shiny app takes up a lot of screen space, so make sure your window is open wide enough to see all controls._
+
+```{r app, echo=FALSE}
+
+bandit_app(height = 1800)
+
+```
+
+
+
